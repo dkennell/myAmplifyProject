@@ -1,0 +1,15 @@
+{
+	"auth": {
+		"myamplifyproject275f4913": {
+			"service": "Cognito",
+			"providerPlugin": "awscloudformation",
+			"dependsOn": []
+		}
+	},
+	"storage": {
+		"dkennellaudioresource": {
+			"service": "S3",
+			"providerPlugin": "awscloudformation"
+		}
+	}
+}
