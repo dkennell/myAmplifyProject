@@ -18,7 +18,7 @@ class Main extends React.Component {
   }
   // const [currentRecordingInstance, setRecordingInstance] = useState();
 
-  // Audio.requestPermissionsAsync();
+
 
   render() {
     return (
@@ -36,6 +36,7 @@ class Main extends React.Component {
 }
 
 async function startRecording() {
+  Audio.requestPermissionsAsync();
   alert('You tapped the start record button');
   let myRecordingObject = new Audio.Recording();
 
@@ -43,7 +44,7 @@ async function startRecording() {
     Audio.setAudioModeAsync({allowsRecordingIOS: true, playsInSilentModeIOS: true})
     await myRecordingObject.prepareToRecordAsync(Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY);
     await myRecordingObject.startAsync();
-       this.setState({myRecordingInstance: myRecordingObject})
+    this.setState({myRecordingInstance: myRecordingObject})
     alert('You did it!')
   } catch (error) {
     alert('Error: ', error)
@@ -52,12 +53,12 @@ async function startRecording() {
   }
 }
 
-function stopRecording() {
-  alert('You tapped the stop record button');
+async function stopRecording() {
+  // alert('You tapped the stop record button');
   let myRecording = this.state['myRecordingInstance']
-  myRecording.stopAndUnloadAsync();
-  let mySound = myRecording.createNewLoadedSoundAsync();
-  mySound.playAsync();
+  await myRecording.stopAndUnloadAsync();
+  let mySound = await myRecording.createNewLoadedSoundAsync();
+  mySound['sound'].playAsync();
 
   console.log(this.state)
 }
