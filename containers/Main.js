@@ -1,15 +1,12 @@
+import React from 'react';
 import Amplify, { Storage } from 'aws-amplify';
 import { Audio } from 'expo-av';
-import * as Permissions from 'expo-permissions';
 import awsconfig from '../aws-exports';
+import { StyleSheet, Text, View } from 'react-native';
+
 Amplify.configure(awsconfig);
 
-import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import base64 from 'react-native-base64';
-import { Asset } from 'expo-asset';
-
-export const RECORDING_OPTIONS_PRESET_HIGH_QUALITY: RecordingOptions = {
+const RECORDING_OPTIONS_PRESET_HIGH_QUALITY: RecordingOptions = {
   android: {
     extension: '.m4a',
     outputFormat: Audio.RECORDING_OPTION_ANDROID_OUTPUT_FORMAT_MPEG_4,
@@ -41,7 +38,6 @@ class Main extends React.Component {
     startRecording = startRecording.bind(this);
     stopRecording = stopRecording.bind(this);
   }
-  // const [currentRecordingInstance, setRecordingInstance] = useState();
 
 
 
@@ -62,51 +58,36 @@ class Main extends React.Component {
 
 async function startRecording() {
   Audio.requestPermissionsAsync();
-  alert('You tapped the start record button');
+  Audio.setAudioModeAsync({allowsRecordingIOS: true, playsInSilentModeIOS: true})
+
   let myRecordingObject = new Audio.Recording();
 
   try {
-    Audio.setAudioModeAsync({allowsRecordingIOS: true, playsInSilentModeIOS: true})
     await myRecordingObject.prepareToRecordAsync(RECORDING_OPTIONS_PRESET_HIGH_QUALITY);
     await myRecordingObject.startAsync();
     this.setState({myRecordingInstance: myRecordingObject})
-    alert('You did it!')
+    alert("You're recording! :D")
   } catch (error) {
-    alert('Error: ', error)
+    alert("There was an error. Sorry, I promise I tried. :'(")
     console.log('Error: ', error)
-  // An error occurred!
   }
 }
 
 async function stopRecording() {
-  // alert('You tapped the stop record button');
   let myRecording = this.state['myRecordingInstance']
   await myRecording.stopAndUnloadAsync();
-
-  // let mySound = await myRecording.createNewLoadedSoundAsync();
-  // mySound['sound'].playAsync();
-  //
-  // let soundToSend = mySound['sound'];
-  //
-  // const Buffer = require("buffer").Buffer;
-  // var base64data = new Buffer([soundToSend], "binary");
-
-  // console.log("Sound URI: ", soundToSend.getURI())
-  // console.log("Sound to send: ", soundToSend)
-  // console.log("base64data: ", base64data)
 
   let recordingURI = myRecording.getURI()
   const response = await fetch(recordingURI);
   const blob = await response.blob();
 
-
-
-
-  console.log("Recording URI: ", recordingURI)
-
   Storage.put('my_audio_file.caf', blob)
-    .then (result => console.log(result)) // {key: "test.txt"}
-    .catch(err => console.log(err));
+    .then (result => {console.log(result)
+      alert('Recording succesfully uploaded!')
+    })
+    .catch(err => {console.log(err)
+      alert('Recording upload failed. :(')
+    });
 }
 
 const styles = StyleSheet.create({
